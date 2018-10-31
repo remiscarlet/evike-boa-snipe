@@ -20,7 +20,7 @@ function run() {
         
         setTimeout(function() {
             location.reload();
-        }, 5000);
+        }, 15000);
     } else if (curr_url === "https://www.evike.com/account.php") {
         // Account page. We get here if we just logged in. Redirect to epic deals page.
         setUrl("https://www.evike.com/epic-deals/");
