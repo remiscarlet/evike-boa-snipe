@@ -7,20 +7,22 @@ var CC_CVV = "666"
 
 var EPIC_DEAL_ITEM_NAME = "THE BOX OF AWESOMENESS - \"Flash Edition\"";
 
+var BUY_ENABLED = false;
+
 /*==================================*/
 if (ENABLED) { run(); }
 function run() {
     var curr_url  = window.location.href;
     console.log(curr_url)
     
-    ensureLoggedIn(curr_url);
+    if ( ! ensureLoggedIn(curr_url)) { return; };
     
     if (curr_url === "https://www.evike.com/epic-deals/") {
         openBoALinkIfAvailable();
-        
+        var ms_to_wait = (getRandomInt(10) + 10) * 1000;
         setTimeout(function() {
             location.reload();
-        }, 15000);
+        }, ms_to_wait);
     } else if (curr_url === "https://www.evike.com/account.php") {
         // Account page. We get here if we just logged in. Redirect to epic deals page.
         setUrl("https://www.evike.com/epic-deals/");
@@ -46,7 +48,9 @@ function run() {
         if (isTargetInCart()) {
             console.log("PLACING ORDER");
             // PLACE ORDER
-            //$('button[name="placeorderbuttont"]').click();
+            if (BUY_ENABLED) {
+                $('button[name="placeorderbuttont"]').click();
+            }
         }
     } else {
         // BoA buy page
@@ -126,4 +130,8 @@ function ensureLoggedIn(curr_url) {
 function setUrl(url) {
     console.log("Redirecting to: "+url);
     location.replace(url);
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
 }
