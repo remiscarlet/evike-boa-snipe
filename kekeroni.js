@@ -5,6 +5,8 @@ var CC_NUM = "4111111111111111"
 var CC_EXP = "12/34"
 var CC_CVV = "666"
 
+var EPIC_DEAL_ITEM_NAME = "THE BOX OF AWESOMENESS - \"Flash Edition\"";
+
 /*==================================*/
 if (ENABLED) { run(); }
 function run() {
@@ -23,9 +25,9 @@ function run() {
         // Account page. We get here if we just logged in. Redirect to epic deals page.
         setUrl("https://www.evike.com/epic-deals/");
     } else if (curr_url === "https://www.evike.com/shopping_cart.php") {
-        ensureOnlyOneItemInCart();
-
-        setUrl("https://www.evike.com/checkout_shipping.php");
+        if (ensureOnlyOneItemInCart()) {
+            setUrl("https://www.evike.com/checkout_shipping.php");
+        }
     } else if (curr_url === "https://www.evike.com/ec_shipping.php") {
         // Select Ground Shipping
         $('input[value="ups_GND"]').click();
@@ -53,7 +55,7 @@ function run() {
 
 function isBoAInCart() {
     var text = $('#disclaimerbox ~ div.linebox').text();
-    return text.toLowerCase().indexOf('box of awesomeness') !== -1;
+    return text.toLowerCase().indexOf(EPIC_DEAL_ITEM_NAME.toLowerCase()) !== -1;
 }
 
 function enterCCInfo() {
@@ -73,26 +75,36 @@ function enterCCInfo() {
  * If more than one item, clear cart.
  * Once cleared, go back to epic deals page.
  * Once there, rest of logic will handle adding the BoA item into cart if it's available.
+ *
+ * The returns are icky.
  */
 function ensureOnlyOneItemInCart() {
     var cart_len = $('.cartlistproduct').length;
-
     if (cart_len > 1) {
-        // Going to link clears cart.
-        setUrl('/shopping_cart.php?action=clear_cart');
+        // Select all products in cart
+        $('table.cartlist tr[class^="productListing"]').each(function() {
+            $(this).find('td.cartlistselect input').click();
+        });
+
+        // Update cart
+        $('form[name="cart_quantity"] > button.gray').click();
+
+        return false;
     } else if (cart_len === 0) {
         // Nothing in cart. back to epic deals page.
         setUrl("https://www.evike.com/epic-deals/");
+        return false;
     }
+    return true;
 }
 
 function openBoALinkIfAvailable() {
     $('.dealcontainer').find('.dealitem').each(function() {
         var url = $(this).children('a').attr('href');
-        var text = $(this).text();
-        if ((text.indexOf("THE BOX OF AWESOMENESS - \"Flash Edition\"") !== -1) &&
-            (text.indexOf("ADD TO CART") !== -1)){
-                setUrl(url);
+        var text = $(this).text().toLowerCase();
+        if ((text.indexOf(EPIC_DEAL_ITEM_NAME.toLowerCase()) !== -1) &&
+            (text.indexOf("add to cart") !== -1)){
+            setUrl(url);
         }
     });
 }
@@ -112,5 +124,5 @@ function ensureLoggedIn(curr_url) {
 
 function setUrl(url) {
     console.log("Redirecting to: "+url);
-    window.location.href = url;
+    location.replace(url);
 }
