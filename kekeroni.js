@@ -1,6 +1,6 @@
 var ENABLED = false;
 
-var CC_NAME = "Joe Shmoe"
+var CC_NAME = "Joe Schmoe"
 var CC_NUM = "4111111111111111"
 var CC_EXP = "12/34"
 var CC_CVV = "666"
@@ -43,9 +43,10 @@ function run() {
         // Review order page
         $('form[name="checkout_payment"]').children('button.blue').click();
     } else if (curr_url === "https://www.evike.com/checkout_confirmation.php") {
-        if (isBoaInCart) {
+        if (isTargetInCart()) {
+            console.log("PLACING ORDER");
             // PLACE ORDER
-            $('button[name="placeorderbuttont"]').click();
+            //$('button[name="placeorderbuttont"]').click();
         }
     } else {
         // BoA buy page
@@ -53,7 +54,7 @@ function run() {
     }
 }
 
-function isBoAInCart() {
+function isTargetInCart() {
     var text = $('#disclaimerbox ~ div.linebox').text();
     return text.toLowerCase().indexOf(EPIC_DEAL_ITEM_NAME.toLowerCase()) !== -1;
 }
@@ -64,8 +65,8 @@ function enterCCInfo() {
 
     $('input[name="authorizenet_aim_cc_owner"]').val(CC_NAME);
     $('input[name="authorizenet_aim_cc_number"]').val(CC_NUM);
-    $('input[name="authorizenet_aim_cc_expires_month"]').val(exp_month);
-    $('input[name="authorizenet_aim_cc_expires_year"]').val(exp_year);
+    $('select[name="authorizenet_aim_cc_expires_month"] option[value="'+exp_month+'"]').prop('selected', 'selected').change();
+    $('select[name="authorizenet_aim_cc_expires_year"] option[value="'+exp_year+'"]').prop('selected', 'selected').change();
     $('input[name="authorizenet_aim_cc_cvv"]').val(CC_CVV);
 }
 
