@@ -6,8 +6,8 @@ var CC_EXP = "12/34"
 var CC_CVV = "666"
 
 var EPIC_DEAL_ITEM_NAME = "THE BOX OF AWESOMENESS - \"Flash Edition\"";
-
 var BUY_ENABLED = false;
+var COUPON = "freeship";
 
 /*==================================*/
 if (ENABLED) { run(); }
@@ -15,11 +15,11 @@ function run() {
     var curr_url  = window.location.href;
     console.log(curr_url)
     
-    if ( ! ensureLoggedIn(curr_url)) { return; };
+    //if ( ! ensureLoggedIn(curr_url)) { return; };
     
     if (curr_url === "https://www.evike.com/epic-deals/") {
         openBoALinkIfAvailable();
-        var ms_to_wait = (getRandomInt(10) + 10) * 1000;
+        var ms_to_wait = (getRandomInt(15) + 15) * 1000;
         setTimeout(function() {
             location.reload();
         }, ms_to_wait);
@@ -27,9 +27,9 @@ function run() {
         // Account page. We get here if we just logged in. Redirect to epic deals page.
         setUrl("https://www.evike.com/epic-deals/");
     } else if (curr_url === "https://www.evike.com/shopping_cart.php") {
-        if (ensureOnlyOneItemInCart()) {
+        //if (ensureOnlyOneItemInCart()) {
             setUrl("https://www.evike.com/checkout_shipping.php");
-        }
+        //}
     } else if (curr_url === "https://www.evike.com/ec_shipping.php") {
         // Select Ground Shipping
         $('input[value="ups_GND"]').click();
@@ -40,7 +40,7 @@ function run() {
         enterCCInfo();
 
         // Enter free 3 day
-        $('input[name="coupon"]').val("freeship");
+        $('input[name="coupon"]').val(COUPON);
 
         // Review order page
         $('form[name="checkout_payment"]').children('button.blue').click();
@@ -52,9 +52,12 @@ function run() {
                 $('button[name="placeorderbuttont"]').click();
             }
         }
-    } else {
-        // BoA buy page
+    } else if (curr_url.indexOf("https://www.evike.com/products/") !== -1) {
         $('.addtocart').click();
+    } else if (curr_url === "https://www.evike.com/logoff/") {
+        console.log("phew");
+    } else {
+        setUrl("https://www.evike.com/logoff/")
     }
 }
 
@@ -116,20 +119,24 @@ function openBoALinkIfAvailable() {
 
 function ensureLoggedIn(curr_url) {
     var acct_container_text = $('.account-container').text();
-    if (acct_container_text.indexOf("Sign In") !== -1) {
-        setUrl('https://www.evike.com/login.php');
-    }
     
     if (curr_url === "https://www.evike.com/login.php") {
+        console.log("Logging in after delay");
         setTimeout(function() {
             $('form[name="login"]').children('button').click();
+            return false;
         }, 5000);
-    }
+    } else if (acct_container_text.indexOf("Sign In") !== -1) {
+        setUrl('https://www.evike.com/login.php');
+        return false;
+    }    
+
+    return true;
 }
 
 function setUrl(url) {
     console.log("Redirecting to: "+url);
-    location.replace(url);
+    setTimeout(function() {location.replace(url);}, 2000)
 }
 
 function getRandomInt(max) {
