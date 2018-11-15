@@ -15,7 +15,7 @@ function run() {
     var curr_url  = window.location.href;
     console.log(curr_url)
     
-    //if ( ! ensureLoggedIn(curr_url)) { return; };
+    if ( ! ensureLoggedIn(curr_url)) { return; };
     
     if (curr_url === "https://www.evike.com/epic-deals/") {
         openBoALinkIfAvailable();
@@ -40,7 +40,7 @@ function run() {
         enterCCInfo();
 
         // Enter free 3 day
-        $('input[name="coupon"]').val(COUPON);
+        //$('input[name="coupon"]').val("Free3Day");
 
         // Review order page
         $('form[name="checkout_payment"]').children('button.blue').click();
@@ -49,13 +49,21 @@ function run() {
             console.log("PLACING ORDER");
             // PLACE ORDER
             if (BUY_ENABLED) {
-                $('button[name="placeorderbuttont"]').click();
+                //$('button[name="placeorderbuttont"]').click();
             }
         }
     } else if (curr_url.indexOf("https://www.evike.com/products/") !== -1) {
-        $('.addtocart').click();
+        var title_text = $('h1.header-product').text().toLowerCase();
+        
+        if(title_text.indexOf(EPIC_DEAL_ITEM_NAME.toLowerCase()) !== -1) {
+            $('.addtocart').click();
+        } else {
+            console.log("On unknown item page!")
+        }
     } else if (curr_url === "https://www.evike.com/logoff/") {
         console.log("phew");
+    } else if (curr_url === "https://www.evike.com/checkout_success.php") { 
+        setUrl("https://www.evike.com/logoff/");
     } else {
         setUrl("https://www.evike.com/logoff/")
     }
